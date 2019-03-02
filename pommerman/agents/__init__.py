@@ -7,3 +7,4 @@ from .random_agent import RandomAgent
 from .simple_agent import SimpleAgent
 from .tensorforce_agent import TensorForceAgent
 from .dqn_agent import DQN_agent
+from .spin_agent import SPN_agent

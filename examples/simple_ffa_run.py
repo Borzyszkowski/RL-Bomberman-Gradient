@@ -13,10 +13,10 @@ def main():
 
     # Create a set of agents (exactly four)
     agent_list = [
-        agents.SimpleAgent(),
-        agents.RandomAgent(),
-        agents.SimpleAgent(),
-        agents.RandomAgent(),
+        agents.PlayerAgent(),  # Agent 0 - left top
+        agents.PlayerAgent(),  # Agent 1 - left bottom
+        agents.PlayerAgent(),  # Agent 2 - right bottom
+        agents.SPN_agent()  # Agent 3 - right top
     ]
     # Make the "Free-For-All" environment using the agent list
     env = pommerman.make('PommeFFACompetition-v0', agent_list)
@@ -29,7 +29,7 @@ def main():
             env.render()
             actions = env.act(state)
             state, reward, done, info = env.step(actions)
-        print('Episode {} finished'.format(i_episode))
+        print('Episode {} finished, winner: {}'.format(i_episode, info['winners']))
     env.close()
 
 
