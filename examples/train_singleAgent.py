@@ -4,11 +4,7 @@ import pommerman
 from pommerman import agents
 
 import torch
-from torch import nn
-from torch.autograd import Variable
-import gym
 import numpy as np
-import pandas as pd
 import random
 from collections import namedtuple
 import getopt
@@ -158,7 +154,7 @@ def main(argv):
         if memory.__len__() > 10000:
             batch = memory.sample(batch_size)
             agent_list[3].backward(batch)
-        if i > 0 and i % 750 == 0:
+        if i > 0 and i % 100 == 0:
             save_checkpoint({
                     'epoch': i + 1,
                     'arch': 0,
@@ -179,6 +175,7 @@ def main(argv):
         }, agent_list[3].__class__.__name__)
 
     writer.close()
+
 
 if __name__ == '__main__':
     main(sys.argv[1:])
