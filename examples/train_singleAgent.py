@@ -95,7 +95,8 @@ def main(argv):
     start_epoch = 0
     end_epoch = 5750
 
-
+    # Writer to log data to tensorboard
+    writer = SummaryWriter('runs')
 
     if checkpoint_file_path != '':
         start_epoch = load_checkpoint(agent_list[3], checkpoint_file_path)
@@ -130,7 +131,22 @@ def main(argv):
             total_reward = [x + y for x, y in zip(total_reward, reward)]
             steps_per_episode += 1
 
+        # Log infos about our leaning agent to tensorboad
+        writer.add_scalars('data/actions', {'stop': action_histo[0], 'up': action_histo[1], 'down': action_histo[2],
+                                            'left': action_histo[3], 'right': action_histo[4],
+                                            'bomb': action_histo[5]}, i)
+        writer.add_scalar('data/alive_steps', alive_steps, i)
+        writer.add_scalar('data/epsilon', agent_list[3].epsilon, i)
+        writer.add_scalar('data/memory', memory.__len__(), i)
 
+        # Creates a dictionary with agent name and rewards to be logged on tensorboard
+        total_reward_list = []
+        for j in range(len(total_reward)):
+            total_reward_list.append((type(agent_list[j]).__name__ + '(' + str(j) + ')', total_reward[j]))
+        writer.add_scalars('data/rewards', dict(total_reward_list), i)
+
+        spinInput = agent_list[3].Input
+        writer.add_image('end_img', spinInput.reshape(spinInput.shape[1], spinInput.shape[2], spinInput.shape[3]), i)
 
         if 'winners' in info:
             print("Episode : {}, steps_per_episode: {}, winner: {}, reward: {}, total_reward: {}"
@@ -162,7 +178,7 @@ def main(argv):
             'optimizer': agent_list[3].optimizer.state_dict(),
         }, agent_list[3].__class__.__name__)
 
-
+    writer.close()
 
 if __name__ == '__main__':
     main(sys.argv[1:])
