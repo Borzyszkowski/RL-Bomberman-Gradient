@@ -4,22 +4,15 @@ import tensorflow as tf
 
 def main():
     # Create agent able to learn
-    # model = create_model()
-    # dqn_agent = agents.DQN_agent(model, epsilon=0.5)
-    # dqn_agent_index = 0
-
-    # create four models to check which is winning most times
-    models = create_four_test_models()
-    dqn_agents = []
-    for i in range(4):
-        dqn_agents.append(agents.DQN_agent(models[i], epsilon=0.5))
+    model = create_model()
+    target_model = create_model()
+    dqn_agent = agents.DQN_agent(model, target_model, epsilon=0.5, ep_decay=0.995)
+    dqn_agent_index = 0
 
     # Create a set of two agents
     agent_list = [
-        dqn_agents[0],
-        dqn_agents[1],
-        dqn_agents[2],
-        dqn_agents[3]
+        dqn_agent,
+        agents.SimpleAgent()
     ]
 
     # Make the "Free-For-All" environment using the agent list
@@ -27,7 +20,7 @@ def main():
     # env = pommerman.make('PommeFFACompetition-v0', agent_list)
 
     # Run the episodes just like OpenAI Gym
-    for episode in range(30):
+    for episode in range(100):
         steps_per_episode = 0
         state = env.reset()
         done = False
@@ -37,20 +30,20 @@ def main():
             new_state, reward, done, info = env.step(actions)
             steps_per_episode += 1
             # agents learning
-            for i in range(4):
-                dqn_agents[i].remember(
-                    state[i], actions[i],
-                    reward[i], done, new_state[i]
-                )
-                dqn_agents[i].experience_replay()
-
+            dqn_agent.remember(
+                state[dqn_agent_index], actions[dqn_agent_index],
+                reward[dqn_agent_index], done, new_state[dqn_agent_index]
+            )
+            dqn_agent.experience_replay()
+            dqn_agent.target_train()
+            
             state = new_state
 
-        print('Episode {} finished\n steps: {}\ninfo: {}'.
+        print('Episode {} finished, steps: {}\ninfo: {}'.
             format(episode, steps_per_episode, info))
-        # saving weights after every epoch
-        for i, dqn_agent in enumerate(dqn_agents):
-            dqn_agent.save_weights("./weights/model_{}_episode_{}".format(i, episode))
+        if episode % 9 == 0:
+            # saving weights after every epoch
+            dqn_agent.save_weights("./weights/best_model_episode_{}".format(episode))
     env.close()
 
 def create_four_test_models():
@@ -80,7 +73,7 @@ def create_four_test_models():
         tf.keras.layers.Dense(100, activation='relu'),
         tf.keras.layers.Dense(6, activation='softmax')
     ])
-    model3.compile(optimizer=tf.train.AdamOptimizer(0.001), loss='mse', metrics=['mae'])
+    model3.compile(optimizer=tf.train.AdamOptimizer(0.001), loss='categorical_crossentropy', metrics=['mae'])
 
     model4 = tf.keras.Sequential([
         tf.keras.layers.Conv2D(8, input_shape=(11, 11, 6), kernel_size=(3, 3), activation='relu'),
@@ -102,7 +95,7 @@ def create_model():
         tf.keras.layers.Dense(100, activation='relu'),
         tf.keras.layers.Dense(6, activation='softmax')
     ])
-    model.compile(optimizer=tf.train.AdamOptimizer(0.001), loss='mse', metrics=['mae'])
+    model.compile(optimizer=tf.train.AdamOptimizer(0.001), loss='categorical_crossentropy', metrics=['mae'])
     return model
 
 if __name__ == '__main__':
