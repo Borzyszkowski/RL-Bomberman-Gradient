@@ -1,2 +1,2 @@
-model_checkpoint_path: "model_3_episode_0"
-all_model_checkpoint_paths: "model_3_episode_0"
+model_checkpoint_path: "best_model_episode_54"
+all_model_checkpoint_paths: "best_model_episode_54"

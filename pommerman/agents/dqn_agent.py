@@ -8,10 +8,12 @@ import random
 
 class DQN_agent(BaseAgent):
     
-    def __init__(self, model, gamma=0.95, memory_length=10000, 
+    def __init__(self, model, target_model, gamma=0.95, memory_length=10000, 
         epsilon=1.0, ep_decay=0.999, batch_size=32):
         super(DQN_agent, self).__init__()
         self.model = model
+        self.target_model = target_model
+        self.tau = .125
         self.memory = deque(maxlen=memory_length)
         # set hyperparameters
         self.gamma = gamma
@@ -42,13 +44,20 @@ class DQN_agent(BaseAgent):
                 old_states.append(old_state)
                 q_update = reward
                 if not done:
-                    q_update += self.gamma * np.max(self.model.predict(np.array([new_state])))
-                q_val = self.model.predict(np.array([old_state]))[0]
+                    q_update += self.gamma * np.max(self.target_model.predict(np.array([new_state])))
+                q_val = self.target_model.predict(np.array([old_state]))[0]
                 q_val[action] = q_update
                 q_vals.append(q_val)
             old_states = np.array(old_states)
             q_vals = np.array(q_vals)
             self.model.fit(old_states, q_vals, verbose=0)
+
+    def target_train(self):
+        weights = self.model.get_weights()
+        target_weights = self.target_model.get_weights()
+        for i in range(len(target_weights)):
+            target_weights[i] = weights[i] * self.tau + target_weights[i] * (1 - self.tau)
+        self.target_model.set_weights(target_weights)
 
     # prepare state as stack of 11x11 matrices
     def preprocess_observation(self, obs):
@@ -56,7 +65,7 @@ class DQN_agent(BaseAgent):
         prepared_features_list = []
 
         # board matrixs with enemies as 11 and agent as 10
-        board_features = obs['board']
+        board_features = obs['board'].copy()
         agent_x, agent_y = obs['position']
         for i in range(len(board_features)):
             for j in range(len(board_features[i])):
