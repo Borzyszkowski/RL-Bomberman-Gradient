@@ -4,15 +4,14 @@ import pommerman
 from pommerman import agents
 
 import torch
-from torch import nn
-from torch.autograd import Variable
-import gym
 import numpy as np
-import pandas as pd
 import random
 from collections import namedtuple
 import getopt
 import sys
+
+from tensorboardX import SummaryWriter  # requires protobuf newest than 3.5
+
 
 Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward', 'done'))
 
@@ -92,6 +91,9 @@ def main(argv):
     start_epoch = 0
     end_epoch = 5750
 
+    # Writer to log data to tensorboard
+    writer = SummaryWriter('runs')
+
     if checkpoint_file_path != '':
         start_epoch = load_checkpoint(agent_list[3], checkpoint_file_path)
 
@@ -115,7 +117,7 @@ def main(argv):
 
             # Fill replay memory for our learning agent
             memory.push(agent_list[3].Input, torch.LongTensor([actions[3]]),
-                        torch.from_numpy(agent_list[3].prepInput(state[3])).type(torch.FloatTensor),
+                        torch.from_numpy(agent_list[3].prep_input(state[3])).type(torch.FloatTensor),
                         torch.Tensor([reward[3]]),
                         torch.Tensor([done]))
 
@@ -124,6 +126,23 @@ def main(argv):
             alive_steps += 1
             total_reward = [x + y for x, y in zip(total_reward, reward)]
             steps_per_episode += 1
+
+        # Log infos about our leaning agent to tensorboad
+        writer.add_scalars('data/actions', {'stop': action_histo[0], 'up': action_histo[1], 'down': action_histo[2],
+                                            'left': action_histo[3], 'right': action_histo[4],
+                                            'bomb': action_histo[5]}, i)
+        writer.add_scalar('data/alive_steps', alive_steps, i)
+        writer.add_scalar('data/epsilon', agent_list[3].epsilon, i)
+        writer.add_scalar('data/memory', memory.__len__(), i)
+
+        # Creates a dictionary with agent name and rewards to be logged on tensorboard
+        total_reward_list = []
+        for j in range(len(total_reward)):
+            total_reward_list.append((type(agent_list[j]).__name__ + '(' + str(j) + ')', total_reward[j]))
+        writer.add_scalars('data/rewards', dict(total_reward_list), i)
+
+        spinInput = agent_list[3].Input
+        writer.add_image('end_img', spinInput.reshape(spinInput.shape[1], spinInput.shape[2], spinInput.shape[3]), i)
 
         if 'winners' in info:
             print("Episode : {}, steps_per_episode: {}, winner: {}, reward: {}, total_reward: {}"
@@ -135,7 +154,7 @@ def main(argv):
         if memory.__len__() > 10000:
             batch = memory.sample(batch_size)
             agent_list[3].backward(batch)
-        if i > 0 and i % 750 == 0:
+        if i > 0 and i % 100 == 0:
             save_checkpoint({
                     'epoch': i + 1,
                     'arch': 0,
@@ -154,6 +173,8 @@ def main(argv):
             'best_prec1': 0,
             'optimizer': agent_list[3].optimizer.state_dict(),
         }, agent_list[3].__class__.__name__)
+
+    writer.close()
 
 
 if __name__ == '__main__':
