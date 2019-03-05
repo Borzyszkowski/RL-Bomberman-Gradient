@@ -89,7 +89,7 @@ def main(argv):
     batch_size = 128
     epsilon = 1
     start_epoch = 0
-    end_epoch = 5750
+    end_epoch = 5750  # add number of games here
 
     # Writer to log data to tensorboard
     writer = SummaryWriter('runs')
@@ -107,7 +107,7 @@ def main(argv):
         epsilon *= 0.995
         alive_steps = 0
         while not done and (not force_restart_on_death or agent_list[3]._character.is_alive):
-            if i > (end_epoch - 50) or always_render:
+            if always_render:
                 env.render()
             # Set epsilon for our learning agent
             agent_list[3].epsilon = max(epsilon, 0.1)
