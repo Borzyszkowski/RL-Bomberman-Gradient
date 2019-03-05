@@ -16,10 +16,10 @@ def main():
     loaded_model = create_model()
     # load weights into new model
     loaded_model.load_weights("./weights/model_2_episode_58")
-    dqn_agent1 = agents.DQN_agent(loaded_model)
-    dqn_agent2 = agents.DQN_agent(loaded_model)
-    dqn_agent3 = agents.DQN_agent(loaded_model)
-    dqn_agent4 = agents.DQN_agent(loaded_model)
+    dqn_agent1 = agents.DQN_agent(loaded_model, loaded_model)
+    dqn_agent2 = agents.DQN_agent(loaded_model, loaded_model)
+    dqn_agent3 = agents.DQN_agent(loaded_model, loaded_model)
+    dqn_agent4 = agents.DQN_agent(loaded_model, loaded_model)
 
     # Create a set of agents (exactly four)
     agent_list = [
@@ -32,15 +32,17 @@ def main():
     env = pommerman.make('PommeFFACompetition-v0', agent_list)
 
     # Run the episodes just like OpenAI Gym
-    for i_episode in range(1):
+    for i_episode in range(100000):
         state = env.reset()
         done = False
         while not done:
-            env.render()
+           # env.render()
             actions = env.act(state)
             state, reward, done, info = env.step(actions)
-        print('Episode {} finished, winner: {}'.format(i_episode, info['winners']))
+        if 'winners' in info:
+            print('Episode {} finished, winner: {}'.format(i_episode, info['winners']))
     env.close()
+    dqn_agent1.save_weights("./weights/model_100k_dqnonly")
 
 
 if __name__ == '__main__':

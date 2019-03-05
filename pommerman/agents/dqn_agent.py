@@ -50,7 +50,7 @@ class DQN_agent(BaseAgent):
                 q_vals.append(q_val)
             old_states = np.array(old_states)
             q_vals = np.array(q_vals)
-            self.model.fit(old_states, q_vals, verbose=0)
+            self.model.fit(old_states, q_vals, verbose=1)
 
     def target_train(self):
         weights = self.model.get_weights()
