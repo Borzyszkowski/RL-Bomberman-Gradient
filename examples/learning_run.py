@@ -6,7 +6,8 @@ def main():
     # Create agent able to learn
     model = create_model()
     target_model = create_model()
-    dqn_agent = agents.DQN_agent(model, target_model, epsilon=0.5, ep_decay=0.995)
+    dqn_agent = agents.DQN_agent(model, target_model, 
+        epsilon=0.5, ep_decay=0.995, batch_size=128, memory_length=1000)
     dqn_agent_index = 0
 
     # Create a set of two agents
@@ -34,14 +35,15 @@ def main():
                 state[dqn_agent_index], actions[dqn_agent_index],
                 reward[dqn_agent_index], done, new_state[dqn_agent_index]
             )
-            dqn_agent.experience_replay()
-            dqn_agent.target_train()
             
             state = new_state
 
+        dqn_agent.experience_replay()
+        dqn_agent.target_train()
+
         print('Episode {} finished, steps: {}\ninfo: {}'.
             format(episode, steps_per_episode, info))
-        if episode % 9 == 0:
+        if episode % 10 == 9:
             # saving weights after every epoch
             dqn_agent.save_weights("./weights/best_model_episode_{}".format(episode))
     env.close()
