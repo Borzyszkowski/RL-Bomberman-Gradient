@@ -1,19 +1,34 @@
-from pommerman.Qlearning.dqn_keras_rl import load_trained_model, get_dqn, get_env, create_model
-from pommerman.Qlearning.evaluation_utils import run_episode
+from pommerman.Qlearning.dqn_keras_rl import create_dqn, set_pommerman_env, create_model, DQN
 from pommerman.Qlearning.env_wrapper import EnvWrapper
+from pommerman.Qlearning.env_with_rewards import EnvWrapperRS
 from pommerman.configs import ffa_v0_fast_env
+from pommerman.envs.v0 import Pomme
+from pommerman.agents import SimpleAgent, RandomAgent, PlayerAgent
 
 BOARD_SIZE = 11
 
 
+def env_for_players():
+    config = ffa_v0_fast_env()
+    env = Pomme(**config["env_kwargs"])
+    agents = [DQN(config["agent"](0, config["game_type"])),
+              PlayerAgent(config["agent"](1, config["game_type"])),
+              RandomAgent(config["agent"](2, config["game_type"])),
+              RandomAgent(config["agent"](2, config["game_type"]))]
+    env.set_agents(agents)
+    env.set_training_agent(agents[0].agent_id)  # training_agent is only dqn agent
+    env.set_init_game_state(None)
+
+    return env
+
+
 def main():
     model = create_model()
-    dqn, callbacks = get_dqn(model=model)
-    dqn.load_weights('../pommerman/Qlearning/models/dqn_agent_full_model.hdf5')
-    config = ffa_v0_fast_env()
-    env = EnvWrapper(get_env(), BOARD_SIZE)
-    # info, reward, lens = run_episode(dqn, config, env=env)
-    dqn.test(env)
+    dqn, callbacks = create_dqn(model=model)
+    dqn.load_weights('../pommerman/Qlearning/models/marcin_weight_14_03_17-20.h5')
+    env = EnvWrapper(set_pommerman_env(), BOARD_SIZE)  # change env_for_players() to set_pommerman_env to have a simulation
+    while True:
+        dqn.test(env)
 
 
 if __name__ == '__main__':
