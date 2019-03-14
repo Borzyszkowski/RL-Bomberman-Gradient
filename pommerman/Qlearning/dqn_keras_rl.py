@@ -121,6 +121,8 @@ if __name__ == '__main__':
     env_wrapper = EnvWrapperRS(set_pommerman_env(agent_id=0), BOARD_SIZE)
     dqn, callbacks = create_dqn(create_model())
 
+    dqn.load_weights('./models/marcin_weight_14_03_17-20.h5')
+
     history = dqn.fit(env_wrapper, nb_steps=NUMBER_OF_STEPS, visualize=False, verbose=2,
                       nb_max_episode_steps=env._max_steps, callbacks=callbacks)
     dqn.model.save('./models/14_03_19.hdf5')
