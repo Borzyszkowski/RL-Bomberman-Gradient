@@ -3,7 +3,7 @@ import numpy as np
 from pommerman import utility
 import os, sys
 sys.path.append('./evaluation_utils.py/')
-from .evaluation_utils import *
+from evaluation_utils import *
 
 class EnvWrapper(Env):
     """The abstract environment class that is used by all agents. This class has the exact
