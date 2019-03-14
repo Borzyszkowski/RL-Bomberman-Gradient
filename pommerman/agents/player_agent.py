@@ -33,7 +33,7 @@ from time import time
 from . import BaseAgent
 from .. import characters
 
-REPEAT_DELAY = 0.2  # seconds
+REPEAT_DELAY = 0.1  # seconds
 REPEAT_INTERVAL = 0.1
 
 

@@ -7,14 +7,14 @@ from keras.layers import Dense, Flatten, Conv2D, Dropout
 from keras.optimizers import Adam
 
 from rl.agents.dqn import DQNAgent
-from rl.policy import BoltzmannQPolicy
+from rl.policy import BoltzmannQPolicy, MaxBoltzmannQPolicy, LinearAnnealedPolicy
 from rl.memory import SequentialMemory
 from rl.callbacks import FileLogger, ModelIntervalCheckpoint
 
 from pommerman.envs.v0 import Pomme
-from pommerman.configs import ffa_v0_fast_env as ffa_v0_env
 from pommerman.configs import ffa_v0_fast_env
 from pommerman.Qlearning.env_wrapper import CustomProcessor, EnvWrapper
+from pommerman.Qlearning.env_with_rewards import EnvWrapperRS
 from pommerman.constants import *
 
 import tensorflow as tf
@@ -28,8 +28,10 @@ config = ffa_v0_fast_env()
 env = Pomme(**config["env_kwargs"])
 ACTIONS = ['stop', 'up', 'down', 'left', 'right', 'bomb']
 NUM_OF_ACTIONS = len(ACTIONS)
+NUMBER_OF_STEPS = 5e6
 
-#Just formal to create enviroment
+
+# Just formal to create enviroment
 class DQN(BaseAgent):
     def act(self, obs, action_space):
         pass
@@ -48,14 +50,16 @@ def create_model():
     model.compile(optimizer=Adam(lr=0.0005), loss=tf.losses.huber_loss, metrics=['mae'])
     return model
 
+
 def load_trained_model(weights_path = './models/dqn_agent_fullmodel.hdf5'):
     model = create_model()
     model.load_weights(filepath=weights_path)
     return model
 
-def get_env(agent_id=0):
+
+def set_pommerman_env(agent_id=0):
     # Instantiate the environment
-    config = ffa_v0_env()
+    config = ffa_v0_fast_env()
     env = Pomme(**config["env_kwargs"])
 
     np.random.seed(0)
@@ -64,13 +68,13 @@ def get_env(agent_id=0):
     agents = [DQN(config["agent"](agent_id, config["game_type"])) if i == agent_id else SimpleAgent(
         config["agent"](i, config["game_type"])) for i in range(4)]
     env.set_agents(agents)
-    env.set_training_agent(agents[agent_id].agent_id) #training_agent is only dqn agent
+    env.set_training_agent(agents[agent_id].agent_id)  # training_agent is only dqn agent
     env.set_init_game_state(None)
 
     return env
 
 
-def get_dqn(model,
+def create_dqn(model,
             log_interval=50000,
             model_name='dqn_agent_checkpoint',
             file_log_path='./logs/log.txt',
@@ -83,9 +87,19 @@ def get_dqn(model,
 
     # Use 4 last observation - history_length = 4
     memory = SequentialMemory(limit=500000, window_length=history_length)
-    policy=BoltzmannQPolicy()
 
-    #Create an instance of DQNAgent from keras-rl
+    # Use combine of BoltzmannQPolicy and EpsGreedyQPolicy
+    policy = MaxBoltzmannQPolicy()
+
+    # Set epsilon to 1.0 and decrease it over every step to stop taking random action when map is explored
+    policy = LinearAnnealedPolicy(inner_policy=policy,
+                                  attr='eps',
+                                  value_max=1.0,
+                                  value_min=0.1,
+                                  value_test=0.04,
+                                  nb_steps=NUMBER_OF_STEPS)
+
+    # Create an instance of DQNAgent from keras-rl
     dqn = DQNAgent(model=model,
                    nb_actions=env.action_space.n,
                    memory=memory,
@@ -101,11 +115,12 @@ def get_dqn(model,
 
     return dqn, callbacks
 
+
 if __name__ == '__main__':
 
-    env_wrapper = EnvWrapper(get_env(agent_id=0), BOARD_SIZE)
-    dqn, callbacks = get_dqn(create_model())
+    env_wrapper = EnvWrapperRS(set_pommerman_env(agent_id=0), BOARD_SIZE)
+    dqn, callbacks = create_dqn(create_model())
 
-    history = dqn.fit(env_wrapper, nb_steps=10000000, visualize=False, verbose=2,
+    history = dqn.fit(env_wrapper, nb_steps=NUMBER_OF_STEPS, visualize=False, verbose=2,
                       nb_max_episode_steps=env._max_steps, callbacks=callbacks)
-    dqn.model.save('./models/dqn_agent_full_model.hdf5')
+    dqn.model.save('./models/14_03_19.hdf5')
