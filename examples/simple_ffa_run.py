@@ -14,9 +14,9 @@ def main():
     # Create a set of agents (exactly four)
     agent_list = [
         agents.PlayerAgent(),  # Agent 0 - left top
-        agents.PlayerAgent(),  # Agent 1 - left bottom
-        agents.PlayerAgent(),  # Agent 2 - right bottom
-        agents.SPN_agent()  # Agent 3 - right top
+        agents.SimpleAgent(),  # Agent 1 - left bottom
+        agents.SimpleAgent(),  # Agent 2 - right bottom
+        agents.SimpleAgent()  # Agent 3 - right top
     ]
     # Make the "Free-For-All" environment using the agent list
     env = pommerman.make('PommeFFACompetition-v0', agent_list)
