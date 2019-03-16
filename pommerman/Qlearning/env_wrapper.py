@@ -102,6 +102,22 @@ class EnvWrapper(Env):
     def featurize(self, obs):
         return featurize(obs, center=True, crop=False)
 
+    def custom_featurize(self, obs):
+        board_features = obs['board'].copy()
+        # get board coordinates of our agent
+        agent_x, agent_y = obs['position']
+        for i in range(len(board_features)):
+            for j in range(len(board_features[i])):
+                # set enemies on board to 11
+                if 10 <= board_features[i][j] <= 13:
+                    board_features[i][j] = 11
+                # set our agent to 10
+                if i == agent_y and j == agent_x:
+                    board_features[i][j] = 10
+        observation = obs.copy()
+        observation['board'] = board_features
+        return featurize(observation, center=True, crop=False)
+
     def __del__(self):
         self.close()
 
