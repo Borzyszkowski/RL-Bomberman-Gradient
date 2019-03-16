@@ -11,12 +11,12 @@ BOARD_SIZE = 11
 def env_for_players():
     config = ffa_v0_fast_env()
     env = Pomme(**config["env_kwargs"])
-    agents = [DQN(config["agent"](0, config["game_type"])),
-              PlayerAgent(config["agent"](1, config["game_type"])),
-              RandomAgent(config["agent"](2, config["game_type"])),
-              RandomAgent(config["agent"](2, config["game_type"]))]
+    agents = [RandomAgent(config["agent"](0, config["game_type"])),
+              RandomAgent(config["agent"](1, config["game_type"])),
+              DQN(config["agent"](2, config["game_type"])),
+              PlayerAgent(config["agent"](3, config["game_type"]))]
     env.set_agents(agents)
-    env.set_training_agent(agents[0].agent_id)  # training_agent is only dqn agent
+    env.set_training_agent(agents[2].agent_id)  # training_agent is only dqn agent
     env.set_init_game_state(None)
 
     return env
@@ -25,8 +25,8 @@ def env_for_players():
 def main():
     model = create_model()
     dqn, callbacks = create_dqn(model=model)
-    dqn.load_weights('../pommerman/Qlearning/models/marcin_weight_14_03_17-20.h5')
-    env = EnvWrapper(set_pommerman_env(), BOARD_SIZE)  # change env_for_players() to set_pommerman_env to have a simulation
+    dqn.load_weights('../pommerman/Qlearning/models/15_03_18-40_marcin_weight_with_rewards.h5')
+    env = EnvWrapper(set_pommerman_env(), BOARD_SIZE)
     while True:
         dqn.test(env)
 
