@@ -25,7 +25,7 @@ def env_for_players():
 def main():
     model = create_model()
     dqn, callbacks = create_dqn(model=model)
-    dqn.load_weights('../pommerman/Qlearning/models/marcin_weight_14_03_17-20.h5')
+    dqn.load_weights('../pommerman/Qlearning/models/15_03_18-40_marcin_weight_with_rewards.h5')
     env = EnvWrapper(set_pommerman_env(), BOARD_SIZE)  # change env_for_players() to set_pommerman_env to have a simulation
     while True:
         dqn.test(env)
