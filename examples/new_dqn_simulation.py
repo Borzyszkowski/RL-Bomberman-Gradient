@@ -26,7 +26,7 @@ def main():
     model = create_model()
     dqn, callbacks = create_dqn(model=model)
     dqn.load_weights('../pommerman/Qlearning/models/15_03_18-40_marcin_weight_with_rewards.h5')
-    env = EnvWrapper(set_pommerman_env(), BOARD_SIZE)
+    env = EnvWrapperRS(set_pommerman_env(), BOARD_SIZE)
     while True:
         dqn.test(env)
 

@@ -24,8 +24,10 @@ class EnvWrapperRS(EnvWrapper):
         state, reward, terminal, info = self.gym.step(all_actions)
 
         action = all_actions[self.gym.training_agent]
-        agent_state = self.featurize(state[self.gym.training_agent])
+        # agent_state = self.featurize(state[self.gym.training_agent])
         agent_reward = reward[self.gym.training_agent]
+        # custom featurize with changes on board
+        agent_state = self.custom_featurize(state[self.gym.training_agent])
 
         agent_reward, reward_info = self.rewardShaping.get_rewards(obs[self.gym.training_agent],
                                                                 action, agent_reward)
