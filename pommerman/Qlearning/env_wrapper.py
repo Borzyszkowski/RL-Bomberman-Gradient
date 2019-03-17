@@ -105,7 +105,7 @@ class EnvWrapper(Env):
     def custom_featurize(self, obs):
         board_features = obs['board'].copy()
         # get board coordinates of our agent
-        agent_x, agent_y = obs['position']
+        agent_y, agent_x = obs['position']
         for i in range(len(board_features)):
             for j in range(len(board_features[i])):
                 # set enemies on board to 11
