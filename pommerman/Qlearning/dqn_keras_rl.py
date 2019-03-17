@@ -28,7 +28,7 @@ config = ffa_v0_fast_env()
 env = Pomme(**config["env_kwargs"])
 ACTIONS = ['stop', 'up', 'down', 'left', 'right', 'bomb']
 NUM_OF_ACTIONS = len(ACTIONS)
-NUMBER_OF_STEPS = 5e6
+NUMBER_OF_STEPS = 1e7
 
 
 # Just formal to create enviroment
@@ -121,8 +121,8 @@ if __name__ == '__main__':
     env_wrapper = EnvWrapperRS(set_pommerman_env(agent_id=0), BOARD_SIZE)
     dqn, callbacks = create_dqn(create_model())
 
-    dqn.load_weights('./models/15_03_18-40_marcin_weight_with_rewards.h5')
+    # dqn.load_weights('./models/marcin_weight_14_03_17-20.h5')
 
-    dqn.fit(env_wrapper, nb_steps=NUMBER_OF_STEPS, visualize=False, verbose=2,
+    history = dqn.fit(env_wrapper, nb_steps=NUMBER_OF_STEPS, visualize=False, verbose=2,
                       nb_max_episode_steps=env._max_steps, callbacks=callbacks)
-    dqn.model.save('./models/14_03_19.hdf5')
+    dqn.model.save('./models/full_model.hdf5')

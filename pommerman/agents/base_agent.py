@@ -1,13 +1,12 @@
 '''This is the base abstraction for agents in pommerman.
 All agents should inherent from this class'''
 from .. import characters
-from rl.core import Agent
 
-class BaseAgent(Agent):
+
+class BaseAgent:
     """Parent abstract Agent."""
 
-    def __init__(self, character=characters.Bomber, **kwargs):
-        super(BaseAgent, self).__init__(**kwargs)
+    def __init__(self, character=characters.Bomber):
         self._character = character
 
     def __getattr__(self, attr):

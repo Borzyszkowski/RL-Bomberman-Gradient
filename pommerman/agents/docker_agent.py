@@ -90,7 +90,7 @@ class DockerAgent(BaseAgent):
                 now = time.time()
                 if timeout and end < now:
                     print("Timed out - %s:%s" % (self._server, self._port))
-                    # raise
+                    raise
 
                 request_url = '%s:%s/ping' % (self._server, self._port)
                 req = requests.get(request_url)

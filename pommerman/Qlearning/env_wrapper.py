@@ -102,12 +102,6 @@ class EnvWrapper(Env):
     def featurize(self, obs):
         return featurize(obs, center=True, crop=False)
 
-    def __del__(self):
-        self.close()
-
-    def __str__(self):
-        return '<{} instance>'.format(type(self).__name__)
-
     def custom_featurize(self, obs):
         board_features = obs['board'].copy()
         # get board coordinates of our agent
@@ -123,6 +117,12 @@ class EnvWrapper(Env):
         observation = obs.copy()
         observation['board'] = board_features
         return featurize(observation, center=True, crop=False)
+
+    def __del__(self):
+        self.close()
+
+    def __str__(self):
+        return '<{} instance>'.format(type(self).__name__)
 
 
 class CustomProcessor(Processor):
