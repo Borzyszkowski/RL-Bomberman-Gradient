@@ -124,7 +124,7 @@ def team_competition_v1_env():
     return locals()
 
 
-def ffa_v0_fast_env():
+def ffa_v0_fast_env(frame_per_seconds=1000):
     """Start up a FFA config with the default settings."""
     env = envs.v0.Pomme
     game_type = constants.GameType.FFA
@@ -137,12 +137,11 @@ def ffa_v0_fast_env():
         'num_wood': constants.NUM_WOOD,
         'num_items': constants.NUM_ITEMS,
         'max_steps': constants.MAX_STEPS,
-        'render_fps': 1000,
+        'render_fps': frame_per_seconds,
         'env': env_entry_point,
     }
     agent = characters.Bomber
     return locals()
-
 
 def ffa_v1_env():
     """Start up a collapsing FFA config with the default settings."""
