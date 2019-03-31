@@ -46,7 +46,7 @@ class EnvWrapper(Env):
         all_actions = self.gym.act(obs)
         all_actions.insert(self.gym.training_agent, action)
         state, reward, terminal, info = self.gym.step(all_actions)
-        agent_state = self.featurize(state[self.gym.training_agent])
+        agent_state = self.custom_featurize(state[self.gym.training_agent])
 
         #         agent_state_history = self.make_observation(agent_state, self.step)
         agent_reward = reward[self.gym.training_agent]
@@ -62,7 +62,7 @@ class EnvWrapper(Env):
         """
         obs = self.gym.reset()
         #         self.step = 1
-        agent_obs = self.featurize(obs[self.gym.training_agent])
+        agent_obs = self.custom_featurize(obs[self.gym.training_agent])
         #         self.observations_history = [agent_obs]
         return agent_obs
 
@@ -117,6 +117,8 @@ class EnvWrapper(Env):
         observation = obs.copy()
         observation['board'] = board_features
         return featurize(observation, center=True, crop=False)
+
+
 
     def __del__(self):
         self.close()

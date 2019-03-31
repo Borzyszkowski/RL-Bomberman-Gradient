@@ -12,9 +12,9 @@ def env_for_players():
     config = ffa_v0_fast_env()
     env = Pomme(**config["env_kwargs"])
     agents = [DQN(config["agent"](0, config["game_type"])),
-              PlayerAgent(config["agent"](1, config["game_type"])),
-              RandomAgent(config["agent"](2, config["game_type"])),
-              RandomAgent(config["agent"](2, config["game_type"]))]
+              SimpleAgent(config["agent"](1, config["game_type"])),
+              SimpleAgent(config["agent"](2, config["game_type"])),
+              SimpleAgent(config["agent"](3, config["game_type"]))]
     env.set_agents(agents)
     env.set_training_agent(agents[0].agent_id)  # training_agent is only dqn agent
     env.set_init_game_state(None)
@@ -26,7 +26,7 @@ def main():
     model = create_model()
     dqn, callbacks = create_dqn(model=model)
     dqn.load_weights('../pommerman/Qlearning/models/18_03_9-10_new_reward.h5')
-    env = EnvWrapperRS(set_pommerman_env(), BOARD_SIZE)  # change env_for_players() to set_pommerman_env to have a simulation
+    env = EnvWrapperRS(env_for_players(), BOARD_SIZE)  # change env_for_players() to set_pommerman_env to have a simulation
     while True:
         dqn.test(env)
 

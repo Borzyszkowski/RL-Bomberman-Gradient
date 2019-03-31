@@ -19,6 +19,7 @@ history_length = 4
 n_channels = 18
 ACTIONS = ['stop', 'up', 'down', 'left', 'right', 'bomb']
 
+
 def make_centered(board, position, view_size=BOARD_SIZE * 2 - 1, crop=False):
     # If it is a perk channel, just return the resized full array
     if np.all(board == 1):

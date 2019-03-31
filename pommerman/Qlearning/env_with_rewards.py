@@ -1,11 +1,11 @@
 from .env_wrapper import EnvWrapper
-from .rewards import Rewards
+from .step_rewards import StepRewards
 
 
 class EnvWrapperRS(EnvWrapper):
     def __init__(self, gym, board_size):
         super(EnvWrapperRS, self).__init__(gym, board_size)
-        self.rewardShaping = Rewards()
+        self.rewardShaping = StepRewards()
 
     def step(self, action):
         """Run one timestep of the environment's dynamics.

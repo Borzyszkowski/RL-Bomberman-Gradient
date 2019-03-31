@@ -13,9 +13,9 @@ def env_for_players():
     config = ffa_v0_fast_env(50)
     env = Pomme(**config["env_kwargs"])
     agents = [DQN(config["agent"](0, config["game_type"])),
-              PlayerAgent(config["agent"](1, config["game_type"]))]
-#              RandomAgent(config["agent"](2, config["game_type"])),
- #             RandomAgent(config["agent"](2, config["game_type"]))]
+              PlayerAgent(config["agent"](1, config["game_type"])),
+             RandomAgent(config["agent"](2, config["game_type"])),
+             RandomAgent(config["agent"](2, config["game_type"]))]
     env.set_agents(agents)
     env.set_training_agent(agents[0].agent_id)  # training_agent is only dqn agent
     env.set_init_game_state(None)
