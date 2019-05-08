@@ -21,8 +21,8 @@ Project was presented on several events and conferences such as FOKA 2019 and GU
 
 ## Authors
 
-* **Hubert Skrzypczak**
-* **Dariusz Piotrowski**
-* **Marcin Świniarski**
 * **Bartłomiej Borzyszkowski**
-
+* **Marcin Świniarski**
+* **Hubert Skrzypczak**
+* **Grzegorz Opoka**
+* **Maksymilian Bubala**
