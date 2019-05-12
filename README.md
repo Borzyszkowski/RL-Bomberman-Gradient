@@ -25,4 +25,4 @@ Project was presented on several events and conferences such as FOKA 2019 and GU
 * **Marcin Świniarski**
 * **Hubert Skrzypczak**
 * **Grzegorz Opoka**
-* **Maksymilian Bubala**
+* **Maksymilian Bubula**
